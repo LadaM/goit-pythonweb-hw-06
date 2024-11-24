@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship, DeclarativeBase
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 class Group(Base):
     __tablename__ = 'groups'
