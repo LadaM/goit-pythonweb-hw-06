@@ -1,6 +1,7 @@
 import random
 
 from faker import Faker
+from sqlalchemy import text
 
 from connect import session
 from models import Group, Student, Teacher, Subject, Grade
@@ -9,13 +10,13 @@ fake = Faker()
 
 
 def clear_tables():
-    session.query(Grade).delete()
-    session.query(Student).delete()
-    session.query(Subject).delete()
-    session.query(Teacher).delete()
-    session.query(Group).delete()
+    session.execute(text("TRUNCATE TABLE grades RESTART IDENTITY CASCADE;"))
+    session.execute(text("TRUNCATE TABLE students RESTART IDENTITY CASCADE;"))
+    session.execute(text("TRUNCATE TABLE subjects RESTART IDENTITY CASCADE;"))
+    session.execute(text("TRUNCATE TABLE teachers RESTART IDENTITY CASCADE;"))
+    session.execute(text("TRUNCATE TABLE groups RESTART IDENTITY CASCADE;"))
     session.commit()
-    print("All tables cleared.")
+    print("All tables cleared and IDs reset.")
 
 
 def seed_groups():
@@ -33,9 +34,23 @@ def seed_teachers():
 
 
 def seed_subjects(teachers):
+    # predefined subject names
+    subject_names = [
+        "Mathematics",
+        "Physics",
+        "Chemistry",
+        "Biology",
+        "History",
+        "Literature",
+        "Computer Science",
+        "Philosophy",
+        "Economics",
+        "Geography"
+    ]
+
     subjects = [
-        Subject(name=fake.word().capitalize(), teacher_id=random.choice(teachers).id)
-        for _ in range(8)
+        Subject(name=name, teacher_id=random.choice(teachers).id)
+        for name in subject_names
     ]
     session.add_all(subjects)
     session.commit()
@@ -59,7 +74,7 @@ def seed_grades(students, subjects):
                 grade = Grade(
                     student_id=student.id,
                     subject_id=subject.id,
-                    grade=round(random.uniform(1, 5), 2),
+                    grade=round(random.uniform(2, 5) / 0.25) * 0.25,  # Step of 0.25
                     date=fake.date_this_year()
                 )
                 grades.append(grade)
@@ -68,7 +83,6 @@ def seed_grades(students, subjects):
     print(f"{len(grades)} grades added.")
 
 
-# Main seeding function
 def seed_data():
     print("Seeding data...")
     clear_tables()
