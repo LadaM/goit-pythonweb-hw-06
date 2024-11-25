@@ -9,12 +9,18 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
+    def __repr__(self):
+        return f"<Group(id={self.id}, name='{self.name}')>"
+
 class Student(Base):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     group_id = Column(Integer, ForeignKey('groups.id'))
     group = relationship('Group', back_populates='students')
+
+    def __repr__(self):
+        return f"<Student(id={self.id}, name='{self.name}', group_id={self.group_id})>"
 
 Group.students = relationship('Student', order_by=Student.id, back_populates='group')
 
@@ -23,12 +29,18 @@ class Teacher(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
+    def __repr__(self):
+        return f"<Teacher(id={self.id}, name='{self.name}')>"
+
 class Subject(Base):
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     teacher_id = Column(Integer, ForeignKey('teachers.id'))
     teacher = relationship('Teacher', back_populates='subjects')
+
+    def __repr__(self):
+        return f"<Subject(id={self.id}, name='{self.name}', teacher_id={self.teacher_id})>"
 
 Teacher.subjects = relationship('Subject', order_by=Subject.id, back_populates='teacher')
 
@@ -41,6 +53,12 @@ class Grade(Base):
     date = Column(Date, nullable=False)
     student = relationship('Student', back_populates='grades')
     subject = relationship('Subject', back_populates='grades')
+
+    def __repr__(self):
+        return (
+            f"<Grade(id={self.id}, student_id={self.student_id}, "
+            f"subject_id={self.subject_id}, grade={self.grade}, date={self.date})>"
+        )
 
 Student.grades = relationship('Grade', order_by=Grade.id, back_populates='student')
 Subject.grades = relationship('Grade', order_by=Grade.id, back_populates='subject')
